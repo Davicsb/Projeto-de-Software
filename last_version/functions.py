@@ -136,8 +136,9 @@ def add_students(dictionary):
         age = input("Enter the student's age: ")
         course = input("Enter the student's course: ")
         level = input("Enter the student's level: ")
-        progress = input("Enter the student's progress (0-100%): ")  # Novo campo de progresso
-        dictionary[name] = {"age": age, "course": course, "level": level, "progress": progress}
+        progress = input("Enter the student's progress (0-100%): ")
+        id = input("Enter the student's id: ")
+        dictionary[name] = {"age": age, "course": course, "level": level, "progress": progress, "id" : id}
         clear_terminal()
         print(f"{name} has been successfully registered")
 
@@ -165,6 +166,19 @@ def add_quiz(dictionary):
         clear_terminal()
         print("Course not found!\n")
 
+def view_quizzes(dictionary):
+    course = input("Enter the course for the quizzes: ")
+    if course in dictionary:
+        if "quizzes" in dictionary[course] and dictionary[course]["quizzes"]:
+            print("\Quizzes:")
+            for i, quizzes in enumerate(dictionary[course]["quizzes"], start=1):
+                print(f"{i}. {quizzes}")
+        else:
+            print("\nNo quizzes available for this course.")
+    else:
+        clear_terminal()
+        print("Course not found!\n")
+
 def add_video(dictionary):
     course = input("Enter the course for the video: ")
     if course in dictionary:
@@ -174,6 +188,19 @@ def add_video(dictionary):
         dictionary[course]["videos"].append(video_link)
         clear_terminal()
         print("Video added successfully!")
+    else:
+        clear_terminal()
+        print("Course not found!\n")
+
+def view_videos(dictionary):
+    course = input("Enter the course for the video: ")
+    if course in dictionary:
+        if "videos" in dictionary[course] and dictionary[course]["videos"]:
+            print("\nVideos posts:")
+            for i, videos in enumerate(dictionary[course]["videos"], start=1):
+                print(f"{i}. {videos}")
+        else:
+            print("\nNo videos available for this course.")
     else:
         clear_terminal()
         print("Course not found!\n")
@@ -190,6 +217,19 @@ def add_forum_post(dictionary):
     else:
         clear_terminal()
         print("Course not found!\n")
+
+def view_forum(dictionary):
+    course = input("Enter the course to view forum posts: ")
+    if course in dictionary:
+        if "forum" in dictionary[course] and dictionary[course]["forum"]:
+            print("\nForum posts:")
+            for i, post in enumerate(dictionary[course]["forum"], start=1):
+                print(f"{i}. {post}")
+        else:
+            print("\nNo posts available for this course.")
+    else:
+        print("\nCourse not found!")
+
 
 def generate_report(dictionary):
     for name, info in dictionary.items():

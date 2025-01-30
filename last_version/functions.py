@@ -1,4 +1,10 @@
 import os
+import PyPDF2
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from io import BytesIO
+from datetime import datetime
+from reportlab.lib import colors
 
 def clear_terminal():
     os.system("cls" if os.name == "nt" else "clear")
@@ -130,16 +136,83 @@ def add_students(dictionary):
         age = input("Enter the student's age: ")
         course = input("Enter the student's course: ")
         level = input("Enter the student's level: ")
-        dictionary[name] = {"age": age, "course": course, "level": level}
+        progress = input("Enter the student's progress (0-100%): ")  # Novo campo de progresso
+        dictionary[name] = {"age": age, "course": course, "level": level, "progress": progress}
         clear_terminal()
         print(f"{name} has been successfully registered")
 
 def track_student(dictionary):
     name = input("Enter the student's name: ")
     if name in dictionary:
-        level = dictionary[name]["level"]
+        progress = dictionary[name]["progress"]
         clear_terminal()
-        print(f"Current level: {level}\n")
+        print(f"Current progress: {progress}%\n")  # Mostra o progresso do aluno
+    else:
+        clear_terminal()
+        print("Student not found!\n")
+
+def add_quiz(dictionary):
+    course = input("Enter the course for the quiz: ")
+    if course in dictionary:
+        question = input("Enter the quiz question: ")
+        answer = input("Enter the correct answer: ")
+        if "quizzes" not in dictionary[course]:
+            dictionary[course]["quizzes"] = []
+        dictionary[course]["quizzes"].append({"question": question, "answer": answer})
+        clear_terminal()
+        print("Quiz added successfully!")
+    else:
+        clear_terminal()
+        print("Course not found!\n")
+
+def add_video(dictionary):
+    course = input("Enter the course for the video: ")
+    if course in dictionary:
+        video_link = input("Enter the video URL: ")
+        if "videos" not in dictionary[course]:
+            dictionary[course]["videos"] = []
+        dictionary[course]["videos"].append(video_link)
+        clear_terminal()
+        print("Video added successfully!")
+    else:
+        clear_terminal()
+        print("Course not found!\n")
+
+def add_forum_post(dictionary):
+    course = input("Enter the course for the forum: ")
+    if course in dictionary:
+        post = input("Enter your forum post: ")
+        if "forum" not in dictionary[course]:
+            dictionary[course]["forum"] = []
+        dictionary[course]["forum"].append(post)
+        clear_terminal()
+        print("Post added to the forum!")
+    else:
+        clear_terminal()
+        print("Course not found!\n")
+
+def generate_report(dictionary):
+    for name, info in dictionary.items():
+        print(f"Student: {name}, Progress: {info.get('progress', 'N/A')}%")
+
+def check_course_access(dictionary):
+    name = input("Enter the student's name that you wanna acess: ")
+    course = input("Enter the course that you wanna check: ")
+    if name in dictionary:
+        if course in dictionary[name]["course"]:
+            print("Access granted")
+        else:
+            print("Access denied")
+    else:
+        print("Student not found!")
+
+def manage_payment(dictionary):
+    name = input("Enter the student's name: ")
+    if name in dictionary:
+        paid = input("Has the student paid? (yes/no): ")
+        dictionary[name]["paid"] = paid
+        clear_terminal()
+        print(f"Payment status for {name}: {paid}")
     else:
         clear_terminal()
         print("Student not found!\n")
@@ -179,3 +252,72 @@ def update_student(dictionary):
     else:
         clear_terminal()
         print("Student not found!\n")
+
+def fill_and_generate_certificate(dictionary):
+    # Solicita o nome do aluno
+    name = input("Enter the student's name: ")
+
+    # Criação do PDF
+    packet = BytesIO()
+    c = canvas.Canvas(packet, pagesize=letter)
+
+    # Coletando a data atual
+    date = datetime.now().strftime("%B %d, %Y")
+
+    # Definindo um fundo para o certificado
+    c.setFillColor(colors.lightgrey)
+    c.rect(30, 550, 550, 250, fill=1)  # Caixa de fundo
+    c.setFillColor(colors.black)
+    c.rect(30, 550, 550, 250, fill=0)  # Borda
+
+    # Cabeçalho do certificado
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(180, 800, "Certificate of Completion")
+
+    # Nome do estudante - Maior destaque
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(100, 740, f"Student: {name}")
+
+    # Nome do curso
+    course_name = dictionary[name]["course"]
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(100, 710, f"Course: {course_name}")
+
+    # ID do estudante
+    student_id = dictionary[name]["id"]
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 680, f"Student ID: {student_id}")
+
+    # Data de emissão
+    c.setFont("Helvetica", 12)
+    c.drawString(100, 650, f"Date: {date}")
+
+    # Linha de assinatura
+    c.line(100, 600, 500, 600)
+    c.setFont("Helvetica-Oblique", 12)
+    c.drawString(100, 590, "Instructor's Signature")
+
+    # Salvando o conteúdo gerado
+    c.save()
+
+    # Movendo o buffer para o início
+    packet.seek(0)
+
+    # Criando o PDF com os dados preenchidos
+    output_pdf = PyPDF2.PdfWriter()
+
+    # Carregando a página gerada
+    new_pdf = PyPDF2.PdfReader(packet)
+    page = new_pdf.pages[0]
+
+    # Adicionando a página ao arquivo final
+    output_pdf.add_page(page)
+
+    # Definindo o nome do arquivo de saída
+    output_filename = f"{name}_certificate_filled.pdf"
+
+    # Salvando o PDF gerado
+    with open(output_filename, "wb") as output_file:
+        output_pdf.write(output_file)
+
+    return output_filename

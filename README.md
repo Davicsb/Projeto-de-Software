@@ -1,6 +1,6 @@
 # Projeto-de-Software
 E-Learning Platform\
-Funcionalidades implementadas:\
+Funciotons implemented:\
 • Course Creation and Management: Instructors can create, update, and manage online courses;\
 • Student Enrollment and Tracking: Managing student enrollments and tracking their progress;\
 • Interactive Learning Tools: Incorporating quizzes, assignments, and interactive content;\
@@ -12,5 +12,6 @@ chat;\
 engagement;\
 • Content Access Control: Managing access permissions for different types of content;\
 • Payment and Subscription Management: Handling course fees, subscriptions, and financial
-transactions.
+transactions.\
+As the code is being run on the terminal, the mobile compatibility function has been ignored for now
 
